@@ -19,18 +19,27 @@ class Mtproto extends Socks {
   final String uptime;
 
   @override
-  Mtproto copyWith(
-      {String? unix, String? ip, String? port, String? country, String? ping}) {
+  Mtproto copyWith({
+    String? unix,
+    String? ip,
+    String? port,
+    String? country,
+    String? ping,
+    String? secret,
+    String? up,
+    String? down,
+    String? uptime,
+  }) {
     return Mtproto(
       unix: unix ?? '',
       port: port ?? '',
       country: country ?? '',
       ping: ping ?? '',
       host: ip ?? '',
-      secret: secret,
-      up: up,
-      down: down,
-      uptime: uptime,
+      secret: secret ?? '',
+      up: up ?? '',
+      down: down ?? '',
+      uptime: uptime ?? '',
     );
   }
 
