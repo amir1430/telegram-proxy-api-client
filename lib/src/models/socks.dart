@@ -51,7 +51,7 @@ class Socks extends Equatable {
     );
   }
 
-  Uri get uri => Uri(
+  Uri get launchUrl => Uri(
       scheme: 'tg',
       host: 'socks',
       queryParameters: {"server": ip, "port": port});

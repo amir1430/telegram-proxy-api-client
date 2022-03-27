@@ -5,6 +5,8 @@ class FetchRequestException implements Exception {}
 
 class JsonDeserializationException implements Exception {}
 
+class InvalidFetchDataException implements Exception {}
+
 abstract class ITelegramProxyApiClient {
   Future<List<Mtproto>> getMtprotos();
   Future<List<Socks>> getsocksts();
@@ -18,37 +20,45 @@ class TelegramProxyApiClient implements ITelegramProxyApiClient {
   final Dio _dioClient;
 
   @override
-  Future<List<Mtproto>> getMtprotos() async =>
-      await _getMtprotoOrSocks<Mtproto>(
+  Future<List<Mtproto>> getMtprotos() async => await _fetchProxies<Mtproto>(
         parser: (e) => Mtproto.fromJson(e),
         type: ProxyType.mtproto,
       );
 
   @override
-  Future<List<Socks>> getsocksts() async => await _getMtprotoOrSocks<Socks>(
+  Future<List<Socks>> getsocksts() async => await _fetchProxies<Socks>(
         parser: (e) => Socks.fromJson(e),
         type: ProxyType.socks,
       );
 
-  Future<List<T>> _getMtprotoOrSocks<T extends Socks>({
-    required _MtprotoOrSocks<T> parser,
+  Future<List<T>> _fetchProxies<T extends Socks>({
     required ProxyType type,
+    required _MtprotoOrSocks<T> parser,
   }) async {
-    final proxies = await _fetchProxies(type);
-    try {
-      return proxies.map<T>(parser).toList();
-    } catch (e) {
-      throw JsonDeserializationException();
-    }
-  }
+    late final Response response;
 
-  Future<List<dynamic>> _fetchProxies(ProxyType type) async {
     try {
-      final res = await _dioClient.get('?type=${type.type}');
-      return res.data as List<dynamic>;
+      response = await _dioClient.get('?type=${type.type}');
     } catch (e) {
       throw FetchRequestException();
     }
+
+    if (response.statusCode != 200) {
+      throw FetchRequestException();
+    }
+
+    if (response.data is! List<dynamic>) {
+      throw InvalidFetchDataException();
+    }
+
+    late final List<T> proxies;
+
+    try {
+      proxies = response.data.map<T>(parser).toList();
+    } catch (e) {
+      throw JsonDeserializationException();
+    }
+    return proxies;
   }
 }
 

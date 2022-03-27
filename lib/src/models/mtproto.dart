@@ -31,15 +31,15 @@ class Mtproto extends Socks {
     String? uptime,
   }) {
     return Mtproto(
-      unix: unix ?? '',
-      port: port ?? '',
-      country: country ?? '',
-      ping: ping ?? '',
-      host: ip ?? '',
-      secret: secret ?? '',
-      up: up ?? '',
-      down: down ?? '',
-      uptime: uptime ?? '',
+      unix: unix ?? this.unix,
+      port: port ?? this.port,
+      country: country ?? this.country,
+      ping: ping ?? this.ping,
+      host: ip ?? this.ip,
+      secret: secret ?? this.secret,
+      up: up ?? this.up,
+      down: down ?? this.down,
+      uptime: uptime ?? this.uptime,
     );
   }
 
@@ -73,11 +73,10 @@ class Mtproto extends Socks {
   }
 
   @override
-  Uri get uri => super.uri.replace(
+  Uri get launchUrl => super.launchUrl.replace(
       host: 'proxy',
-      queryParameters: {...super.uri.queryParameters, "secret": secret});
+      queryParameters: {...super.launchUrl.queryParameters, "secret": secret});
 
   @override
-  List<Object?> get props =>
-      [ip, port, secret, country, up, down, uptime, unix, ping];
+  List<Object?> get props => [...super.props, secret, up, down, uptime];
 }
